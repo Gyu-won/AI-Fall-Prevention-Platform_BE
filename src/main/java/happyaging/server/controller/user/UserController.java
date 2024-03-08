@@ -1,5 +1,6 @@
 package happyaging.server.controller.user;
 
+import happyaging.server.domain.user.User;
 import happyaging.server.dto.user.UserInfoDTO;
 import happyaging.server.dto.user.UserInfoUpdateDTO;
 import happyaging.server.service.user.UserService;
@@ -27,9 +28,10 @@ public class UserController {
     }
 
     @PutMapping
-    public ResponseEntity<Object> updateUser(@RequestBody @Valid UserInfoUpdateDTO userInfoUpdateDTO) {
+    public ResponseEntity<Object> updateUser(@RequestBody @Valid UserInfoUpdateDTO dto) {
         Long userId = userService.readCurrentUserId();
-        userService.updateUserInfo(userId, userInfoUpdateDTO);
+        User user = userService.findUserById(userId);
+        userService.updateUserInfo(userId, user.getEmail(), dto.getName(), dto.getPhoneNumber(), dto.getPassword());
         return ResponseEntity.ok().build();
     }
 

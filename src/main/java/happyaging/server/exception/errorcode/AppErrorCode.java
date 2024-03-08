@@ -21,7 +21,8 @@ public enum AppErrorCode implements ErrorCode {
     INVALID_QUESTION_NUMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 번호입니다."),
     INVALID_ACCOUNT(HttpStatus.BAD_REQUEST, "일치하는 계정을 찾을 수 없습니다."),
     INVALID_ADMIN(HttpStatus.UNAUTHORIZED, "관리자로 등록되지 않은 계정입니다."),
-    DISABLE_TO_CONVERT_EXCEL(HttpStatus.INTERNAL_SERVER_ERROR, "엑셀 파일로 변환에 실패하였습니다.");
+    DISABLE_TO_CONVERT_EXCEL(HttpStatus.INTERNAL_SERVER_ERROR, "엑셀 파일로 변환에 실패하였습니다."),
+    INVALID_JOIN(HttpStatus.BAD_REQUEST, "올바르지 않은 회원가입 요청입니다.");
 
     private final HttpStatus httpStatus;
     private final String message;

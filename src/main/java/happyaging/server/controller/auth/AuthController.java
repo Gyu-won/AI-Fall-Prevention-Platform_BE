@@ -7,8 +7,9 @@ import happyaging.server.dto.auth.JoinRequestDTO;
 import happyaging.server.dto.auth.LoginRequestDTO;
 import happyaging.server.dto.auth.LoginSuccessDTO;
 import happyaging.server.dto.auth.ReadEmailDTO;
-import happyaging.server.dto.auth.SocialJoinRequestDTO;
 import happyaging.server.dto.auth.SocialLoginRequestDTO;
+import happyaging.server.exception.AppException;
+import happyaging.server.exception.errorcode.AppErrorCode;
 import happyaging.server.service.auth.AuthService;
 import happyaging.server.service.user.UserService;
 import jakarta.validation.Valid;
@@ -41,13 +42,16 @@ public class AuthController {
     }
 
     @PostMapping("/join")
-    public LoginSuccessDTO join(@RequestBody @Valid JoinRequestDTO joinRequestDTO) {
-        return authService.join(joinRequestDTO);
+    public LoginSuccessDTO join(@RequestBody @Valid JoinRequestDTO dto) {
+        if (dto.getPassword() == null) {
+            throw new AppException(AppErrorCode.INVALID_JOIN);
+        }
+        return authService.join(dto);
     }
 
     @PostMapping("/join/social")
-    public LoginSuccessDTO join(@RequestBody @Valid SocialJoinRequestDTO socialJoinRequestDTO) {
-        return authService.socialJoin(socialJoinRequestDTO);
+    public LoginSuccessDTO socialJoin(@RequestBody @Valid JoinRequestDTO dto) {
+        return authService.join(dto);
     }
 
     @PostMapping("/refreshToken")

@@ -6,13 +6,14 @@ import happyaging.server.domain.user.Vendor;
 import happyaging.server.dto.auth.JoinRequestDTO;
 import happyaging.server.dto.auth.LoginFailureDTO;
 import happyaging.server.dto.auth.LoginSuccessDTO;
-import happyaging.server.dto.auth.SocialJoinRequestDTO;
 import happyaging.server.dto.auth.SocialLoginRequestDTO;
 import happyaging.server.exception.AppException;
 import happyaging.server.exception.errorcode.AppErrorCode;
 import happyaging.server.exception.errorcode.AuthErrorCode;
 import happyaging.server.repository.user.UserRepository;
 import happyaging.server.security.JwtUtil;
+import happyaging.server.util.Encoder;
+import java.time.LocalDate;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpEntity;
@@ -62,17 +63,11 @@ public class AuthService {
     }
 
     @Transactional
-    public LoginSuccessDTO join(JoinRequestDTO userJoinRequestDTO) {
-        checkDuplicateEmail(userJoinRequestDTO.getEmail());
-        User user = User.createFromJoin(userJoinRequestDTO, encoder);
-        userRepository.save(user);
-        return JwtUtil.createTokens(user);
-    }
-
-    @Transactional
-    public LoginSuccessDTO socialJoin(SocialJoinRequestDTO socialJoinRequestDTO) {
-        checkDuplicateEmail(socialJoinRequestDTO.getEmail());
-        User user = User.createFromSocialJoin(socialJoinRequestDTO);
+    public LoginSuccessDTO join(JoinRequestDTO dto) {
+        checkDuplicateEmail(dto.getEmail());
+        String password = Encoder.encode(dto.getPassword(), dto.getVendor());
+        User user = createUser(dto.getName(), dto.getEmail(), password, dto.getPhoneNumber(),
+                UserType.USER, dto.getVendor());
         userRepository.save(user);
         return JwtUtil.createTokens(user);
     }
@@ -89,6 +84,26 @@ public class AuthService {
         return JwtUtil.createTokens(user);
     }
 
+    @Transactional(readOnly = true)
+    public void checkDuplicateEmail(String email) {
+        userRepository.findByEmail(email).ifPresent(user -> {
+            throw new AppException(AuthErrorCode.EMAIL_DUPLICATED);
+        });
+    }
+
+    private User createUser(String name, String email, String password, String phoneNumber, UserType userType,
+                            Vendor vendor) {
+        return User.builder()
+                .name(name)
+                .email(email)
+                .password(password)
+                .phoneNumber(phoneNumber)
+                .userType(userType)
+                .vendor(vendor)
+                .createdAt(LocalDate.now())
+                .build();
+    }
+
     private String getEmailFromExternalServer(SocialLoginRequestDTO socialLoginRequestDTO) {
         String accessToken = socialLoginRequestDTO.getAccessToken();
         if (accessToken != null) {
@@ -97,13 +112,6 @@ public class AuthService {
             return requestEmail(url, header);
         }
         throw new AppException(AuthErrorCode.INVALID_EXTERNAL_TOKEN);
-    }
-
-    @Transactional(readOnly = true)
-    public void checkDuplicateEmail(String email) {
-        userRepository.findByEmail(email).ifPresent(user -> {
-            throw new AppException(AuthErrorCode.EMAIL_DUPLICATED);
-        });
     }
 
     private static String requestEmail(String url, HttpEntity<String> entity) {

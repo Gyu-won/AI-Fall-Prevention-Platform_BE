@@ -7,9 +7,9 @@ import happyaging.server.domain.option.Option;
 import happyaging.server.domain.product.InstalledImage;
 import happyaging.server.domain.product.Product;
 import happyaging.server.domain.question.Question;
+import happyaging.server.domain.senior.Senior;
 import happyaging.server.domain.survey.Response;
 import happyaging.server.domain.survey.Result;
-import happyaging.server.domain.senior.Senior;
 import happyaging.server.domain.survey.Survey;
 import happyaging.server.domain.user.User;
 import happyaging.server.domain.user.UserType;
@@ -17,6 +17,7 @@ import happyaging.server.dto.admin.image.UpdateExampleImageDTO;
 import happyaging.server.dto.admin.product.ProductInfo;
 import happyaging.server.dto.admin.product.ReadProductInstallDTO;
 import happyaging.server.dto.admin.senior.ReadSeniorDTO;
+import happyaging.server.dto.admin.survey.CreateQuestionDTO;
 import happyaging.server.dto.admin.survey.ExcelDataDTO;
 import happyaging.server.dto.admin.survey.ReadResponseDTO;
 import happyaging.server.dto.admin.survey.ReadSurveyDTO;
@@ -26,7 +27,6 @@ import happyaging.server.dto.admin.user.ReadUserDTO;
 import happyaging.server.dto.admin.util.PagingResponse;
 import happyaging.server.dto.admin.util.StatisticDTO;
 import happyaging.server.dto.senior.SeniorResponseDTO;
-import happyaging.server.dto.admin.survey.CreateQuestionDTO;
 import happyaging.server.exception.AppException;
 import happyaging.server.exception.errorcode.AppErrorCode;
 import happyaging.server.repository.image.ExampleImageRepository;
@@ -40,9 +40,9 @@ import happyaging.server.repository.survey.SurveyRepository;
 import happyaging.server.repository.user.UserRepository;
 import happyaging.server.service.admin.AdminService;
 import happyaging.server.service.auth.AuthService;
+import happyaging.server.service.senior.SeniorService;
 import happyaging.server.service.survey.ResponseService;
 import happyaging.server.service.survey.ResultService;
-import happyaging.server.service.senior.SeniorService;
 import happyaging.server.service.survey.SurveyService;
 import happyaging.server.service.user.UserService;
 import jakarta.validation.Valid;
@@ -134,10 +134,8 @@ public class AdminController {
 
     @Transactional
     @PutMapping("/user/manager/{managerId}")
-    public void updateManager(@RequestBody @Valid CreateManagerDTO request, @PathVariable Long managerId) {
-        User user = userRepository.findById(managerId)
-                .orElseThrow(() -> new AppException(AppErrorCode.INVALID_USER));
-        user.updateManager(request, encoder);
+    public void updateManager(@RequestBody @Valid CreateManagerDTO dto, @PathVariable Long managerId) {
+        userService.updateUserInfo(managerId, dto.getEmail(), dto.getName(), dto.getPhoneNumber(), dto.getPassword());
     }
 
     @Transactional(readOnly = true)

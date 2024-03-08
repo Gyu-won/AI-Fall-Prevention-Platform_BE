@@ -53,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             Long userId = JwtUtil.getUserIdFromToken(token);
-            User user = userService.findUserById(userId);
+            User user = userService.authenticate(userId);
 
             List<GrantedAuthority> authorities = new ArrayList<>();
             authorities.add(new SimpleGrantedAuthority("ROLE_" + user.getUserType().name()));

@@ -2,7 +2,7 @@ spring:
   jpa:
     hibernate:
       database-platform: org.hibernate.dialect.MariaDB106Dialect
-      ddl-auto: none
+      ddl-auto: create
       show_sql: true
   servlet:
     multipart:

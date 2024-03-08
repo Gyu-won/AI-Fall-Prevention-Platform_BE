@@ -1,15 +1,12 @@
 package happyaging.server.service.user;
 
-import happyaging.server.domain.senior.Senior;
 import happyaging.server.domain.user.User;
 import happyaging.server.dto.auth.ReadEmailDTO;
 import happyaging.server.dto.user.UserInfoDTO;
-import happyaging.server.dto.user.UserInfoUpdateDTO;
 import happyaging.server.exception.AppException;
 import happyaging.server.exception.errorcode.AppErrorCode;
-import happyaging.server.repository.senior.SeniorRepository;
 import happyaging.server.repository.user.UserRepository;
-import happyaging.server.service.senior.SeniorService;
+import happyaging.server.util.Encoder;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import java.security.SecureRandom;
@@ -20,7 +17,6 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,10 +26,7 @@ public class UserService {
 
     private static final int TEMP_PASSWORD_LENGTH = 8;
     private final JavaMailSender emailSender;
-    private final SeniorService seniorService;
     private final UserRepository userRepository;
-    private final SeniorRepository seniorRepository;
-    private final BCryptPasswordEncoder encoder;
 
     @PersistenceContext
     private EntityManager entityManager;
@@ -45,22 +38,18 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserInfo(Long userId, UserInfoUpdateDTO userInfoUpdateDTO) {
+    public void updateUserInfo(Long userId, String email, String name, String phoneNumber, String password) {
         User user = findUserById(userId);
-        user.update(userInfoUpdateDTO, encoder);
+        user.update(email, name, phoneNumber, Encoder.encode(password, user.getVendor()));
     }
 
     @Transactional
-    public void deleteUser(Long userId) {
-        seniorRepository.findByUserId(userId).stream()
-                .map(Senior::getId)
-                .forEach(seniorService::deleteSenior);
-        entityManager.flush();
-
-        User user = findUserById(userId);
-        userRepository.delete(user);
+    public void deleteUser(Long id) {
+        User user = findUserById(id);
+        user.delete();
     }
 
+    @Transactional(readOnly = true)
     public Long readCurrentUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
@@ -70,9 +59,8 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public User findUserById(Long userId) {
-        return userRepository.findById(userId)
-                .orElseThrow(() -> new AppException(AppErrorCode.INVALID_USER));
+    public User authenticate(Long userId) {
+        return findUserById(userId);
     }
 
     @Transactional(readOnly = true)
@@ -95,9 +83,15 @@ public class UserService {
     @Transactional
     public String createNewPassword(User user) {
         String temporaryPassword = generateRandomPassword();
-        String encodedPassword = encoder.encode(temporaryPassword);
-        user.updatePassword(encodedPassword);
+        String encodedPassword = Encoder.encode(temporaryPassword, user.getVendor());
+        user.update(user.getEmail(), user.getName(), user.getPhoneNumber(), encodedPassword);
         return temporaryPassword;
+    }
+
+    @Transactional(readOnly = true)
+    public User findUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(AppErrorCode.INVALID_USER));
     }
 
     private String generateRandomPassword() {
@@ -109,6 +103,7 @@ public class UserService {
         }
         return password.toString();
     }
+
 
     @Async
     public void sendEmail(String to, String temporaryPassword) {

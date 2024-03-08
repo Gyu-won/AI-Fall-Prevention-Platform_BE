@@ -1,9 +1,5 @@
 package happyaging.server.domain.user;
 
-import happyaging.server.dto.admin.user.CreateManagerDTO;
-import happyaging.server.dto.auth.JoinRequestDTO;
-import happyaging.server.dto.auth.SocialJoinRequestDTO;
-import happyaging.server.dto.user.UserInfoUpdateDTO;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -20,11 +16,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@NoArgsConstructor
-@AllArgsConstructor
 @Entity
-@Builder
 @Getter
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(uniqueConstraints = {@UniqueConstraint(name = "EMAIL_UNIQUE", columnNames = {"email"})})
 public class User {
 
@@ -55,29 +51,8 @@ public class User {
     @Column(nullable = false)
     private LocalDate createdAt;
 
-    public static User createFromJoin(JoinRequestDTO userJoinRequestDTO, BCryptPasswordEncoder encoder) {
-        return User.builder()
-                .name(userJoinRequestDTO.getName())
-                .email(userJoinRequestDTO.getEmail())
-                .password(encoder.encode(userJoinRequestDTO.getPassword()))
-                .phoneNumber(userJoinRequestDTO.getPhoneNumber())
-                .userType(UserType.USER)
-                .vendor(userJoinRequestDTO.getVendor())
-                .createdAt(LocalDate.now())
-                .build();
-    }
-
-    public static User createFromSocialJoin(SocialJoinRequestDTO socialJoinRequestDTO) {
-        return User.builder()
-                .name(socialJoinRequestDTO.getName())
-                .email(socialJoinRequestDTO.getEmail())
-                .password(null)
-                .phoneNumber(socialJoinRequestDTO.getPhoneNumber())
-                .userType(UserType.USER)
-                .vendor(socialJoinRequestDTO.getVendor())
-                .createdAt(LocalDate.now())
-                .build();
-    }
+    @Column(nullable = false)
+    private boolean isDeleted;
 
     public static User createManager(String email, String password, String name, String phoneNumber,
                                      BCryptPasswordEncoder encoder) {
@@ -92,29 +67,18 @@ public class User {
                 .build();
     }
 
-    public void update(UserInfoUpdateDTO userInfoUpdateDTO, BCryptPasswordEncoder encoder) {
-        this.name = userInfoUpdateDTO.getName();
-        this.phoneNumber = userInfoUpdateDTO.getPhoneNumber();
-
-        String password = userInfoUpdateDTO.getPassword();
-        if (password != null) {
-            this.password = encoder.encode(password);
-        }
+    public void update(String email, String name, String phoneNumber, String password) {
+        this.email = email;
+        this.name = name;
+        this.phoneNumber = phoneNumber;
+        this.password = password;
     }
 
-
-    public void updateManager(CreateManagerDTO createManagerDTO, BCryptPasswordEncoder encoder) {
-        this.email = createManagerDTO.getEmail();
-        this.name = createManagerDTO.getName();
-        this.phoneNumber = createManagerDTO.getPhoneNumber();
-
-        String password = createManagerDTO.getPassword();
-        if (password != null) {
-            this.password = encoder.encode(password);
-        }
+    public void delete() {
+        isDeleted = true;
     }
-
-    public void updatePassword(String password) {
+    
+    private void updatePassword(String password) {
         this.password = password;
     }
 }
