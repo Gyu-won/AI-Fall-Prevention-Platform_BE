@@ -4,6 +4,10 @@
 
 <br/>
 
+<img width="2302" alt="서비스" src="https://github.com/Gyu-won/AI-Fall-Prevention-Platform_BE/assets/54783290/bef8c271-4370-4626-82cf-d7a87008824c">
+
+<br/><br/>
+
 ## 📙 프로젝트 개요
 ### 개발 배경
 
