@@ -1,37 +1,60 @@
-## Happy Aging BE
 
-### 시스템 아키텍쳐
-![image](https://github.com/Happy-Aging/AI-Fall-Prevention-Platform/assets/54783290/351c2d7f-35b7-4382-a212-a132ad398720)
-
+## 70세 이상 노인들의 낙상사고 예방을 위한 애플리케이션
+### 낙상 위험도 설문조사를 통해 낙상 위험도를 측정하고, 낙상 예방 솔루션을 제안합니다.
 
 <br/>
 
-### ER-Diagram
-![image](https://github.com/Gyu-won/AI-Fall-Prevention-Platform_BE/assets/54783290/ea51f721-a153-4275-ab7c-3154b6e1047c)
+## 📙 프로젝트 개요
+### 개발 배경
+
+- 실제 사용되는 서비스를 만들고 싶어 학교 산학 협력 프로그램에 자발적으로 참여하였습니다.
+- **기존의 수작업 중심의 낙상 위험도 측정 및 솔루션 제안 프로세스를 앱 개발을 통해서 개선**하고자 하였습니다.
+
+### 개발 인원
+
+- 기획자 1명, 앱 개발자 1명, 서버 개발자 1명, AI 개발자 1명으로 구성하였습니다.
+
+### 성과
+
+- **사용자가 설문부터 솔루션을 제안 받는 기간이 10일에서 2분으로 단축**되었습니다.
+- **서울시 노인 복지관 협회 및 양천구청과의 2024년 사업 계약에 성공**하였습니다.
 
 <br/>
 
-### Class-Diagram
-<img width="839" alt="ClassDiagram" src="https://github.com/Happy-Aging/AI-Fall-Prevention-Platform/assets/54783290/a879dbf3-f86e-4dbe-8f43-416a22f7eea3">
+## 💻 수행 역할
+
+### 팀 리더 역할
+
+- **소통을 통해 회사와 학생들 사이의 갈등을 해결**하였습니다.
+- 개발자가 아닌 회사 대표님이 이해하기 쉽게 **그림이나 문서를 활용하여 소통**하였습니다.
+- 팀 리더로써 팀을 이끌어 가는 능력과 회사와의 소통 능력을 인정받아 **평가점수 98점을 획득**하였습니다.
 
 <br/>
 
-### Sequence Diagram
+### 서버 개발자역할
 
-**Create Senior**
+**API 개발**
 
-<img width="435" alt="CreateSeniorSequenceDiagram" src="https://github.com/Happy-Aging/AI-Fall-Prevention-Platform/assets/54783290/0c6fb6d2-bd7d-4f64-b642-f7cad698120b">
-
-
-**Submit survey**
-
-<img width="617" alt="SubmitSurveySequenceDiagram" src="https://github.com/Happy-Aging/AI-Fall-Prevention-Platform/assets/54783290/1d7b79be-a613-4e10-8ebb-7db236b804a3">
-
-
+- 관리자 페이지를 포함한 **총 43개의 API를 개발**하였습니다.
 
 <br/>
 
-### API 명세서
-![image](https://github.com/Happy-Aging/AI-Fall-Prevention-Platform/assets/54783290/e39f4148-71f1-463e-ac4a-52120b519e48)
+ **서버 배포**
 
+- 운영하는 서비스에 LoadBalancer와 Multi-AZ를 적용하는 것은 과하다고 생각하여 EC2와 RDS 단일 인스턴스만을 사용하여 **서비스를 배포**하였습니다.
+![image](https://github.com/Gyu-won/AI-Fall-Prevention-Platform_BE/assets/54783290/d9f09fe3-1188-43a8-a4c1-6f6361f200a2)
 
+<br/>
+
+## 버전관리
+```
+java:	17
+spring: 6.0.13
+springBoot: 3.1.5
+lombock: 1.18.30 
+io.jsonwebtoken::jjwt: 0.9.1
+gson: 2.8.6
+mariaDB: 10.6.15
+Gradle: 8.3
+IntelliJ: 2023.2.3
+```
